@@ -23,8 +23,8 @@ export default function ImageUploader({ images, onChange, multiple = true }: Ima
           let width = img.width;
           let height = img.height;
           
-          // Max dimension 1200px
-          const MAX_DIMENSION = 1200;
+          // Max dimension 2048px (Facebook max width)
+          const MAX_DIMENSION = 2048;
           if (width > height && width > MAX_DIMENSION) {
             height *= MAX_DIMENSION / width;
             width = MAX_DIMENSION;
@@ -38,8 +38,8 @@ export default function ImageUploader({ images, onChange, multiple = true }: Ima
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
           
-          // Compress to JPEG with 0.8 quality
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          // Compress to JPEG with 0.9 quality (high quality but smaller size)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
           newBase64Images.push(compressedBase64);
           processedCount++;
           
