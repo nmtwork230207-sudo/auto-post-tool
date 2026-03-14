@@ -33,6 +33,8 @@ export interface AppState {
   fbPageId: string;
   fbToken: string;
   igAccountId: string;
+  geminiApiKey: string;
+  geminiModel: string;
 
   // Create Post Draft
   createPostDraft: {
@@ -41,8 +43,10 @@ export interface AppState {
     manualPrice: string;
     manualDesc: string;
     platforms: { fb: boolean; ig: boolean };
-    scheduleMode: 'now' | 'schedule';
+    scheduleMode: 'now' | 'once' | 'auto';
     scheduleTime: string;
+    postsPerDay: number;
+    timeSlots: string[];
     style: string;
     generatedContent: string;
     showPreviewImage: boolean;
@@ -52,7 +56,10 @@ export interface AppState {
   autoPostDraft: {
     images: string[];
     postMode: 'single' | 'group';
+    scheduleMode: 'now' | 'once' | 'auto';
     scheduleTime: string;
+    postsPerDay: number;
+    timeSlots: string[];
     intervalTime: number; // in minutes
     postsPerInterval: number;
     answerStructure: string;
@@ -88,6 +95,8 @@ export const useStore = create<AppState>()(
       fbPageId: '',
       fbToken: '',
       igAccountId: '',
+      geminiApiKey: '',
+      geminiModel: 'gemini-2.5-flash',
 
       createPostDraft: {
         images: [],
@@ -97,6 +106,8 @@ export const useStore = create<AppState>()(
         platforms: { fb: true, ig: false },
         scheduleMode: 'now',
         scheduleTime: '',
+        postsPerDay: 2,
+        timeSlots: ['09:00', '15:00'],
         style: 'professional',
         generatedContent: '',
         showPreviewImage: true,
@@ -105,7 +116,10 @@ export const useStore = create<AppState>()(
       autoPostDraft: {
         images: [],
         postMode: 'group',
+        scheduleMode: 'auto',
         scheduleTime: '',
+        postsPerDay: 2,
+        timeSlots: ['09:00', '15:00'],
         intervalTime: 60,
         postsPerInterval: 1,
         answerStructure: 'Viết một bài đăng hấp dẫn cho sản phẩm này. Nêu bật 3 ưu điểm và thêm Call-to-action.',
@@ -144,6 +158,8 @@ export const useStore = create<AppState>()(
             platforms: { fb: true, ig: false },
             scheduleMode: 'now',
             scheduleTime: '',
+            postsPerDay: 2,
+            timeSlots: ['09:00', '15:00'],
             style: 'professional',
             generatedContent: '',
             showPreviewImage: true,
@@ -151,7 +167,10 @@ export const useStore = create<AppState>()(
           autoPostDraft: {
             images: [],
             postMode: 'group',
+            scheduleMode: 'auto',
             scheduleTime: '',
+            postsPerDay: 2,
+            timeSlots: ['09:00', '15:00'],
             intervalTime: 60,
             postsPerInterval: 1,
             answerStructure: 'Viết một bài đăng hấp dẫn cho sản phẩm này. Nêu bật 3 ưu điểm và thêm Call-to-action.',
@@ -176,6 +195,8 @@ export const useStore = create<AppState>()(
             platforms: { fb: true, ig: false },
             scheduleMode: 'now',
             scheduleTime: '',
+            postsPerDay: 2,
+            timeSlots: ['09:00', '15:00'],
             style: 'professional',
             generatedContent: '',
             showPreviewImage: true,
@@ -183,7 +204,10 @@ export const useStore = create<AppState>()(
           autoPostDraft: {
             images: [],
             postMode: 'group',
+            scheduleMode: 'auto',
             scheduleTime: '',
+            postsPerDay: 2,
+            timeSlots: ['09:00', '15:00'],
             intervalTime: 60,
             postsPerInterval: 1,
             answerStructure: 'Viết một bài đăng hấp dẫn cho sản phẩm này. Nêu bật 3 ưu điểm và thêm Call-to-action.',

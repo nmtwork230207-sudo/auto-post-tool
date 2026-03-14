@@ -9,7 +9,7 @@ import { useStore } from './store';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('create');
-  const { queue, updateQueueItem, n8nWebhookUrl, logout } = useStore();
+  const { queue, updateQueueItem, n8nWebhookUrl, fbPageId, fbToken, igAccountId, logout } = useStore();
 
   // Global Queue Processor
   useEffect(() => {
@@ -18,31 +18,45 @@ export default function App() {
       const currentQueue = useStore.getState().queue;
       
       (currentQueue || []).forEach(async (item) => {
-        if (item.status === 'pending' && item.scheduleTime <= now) {
+        if (item.status === 'pending') {
           // Mark as processing
           updateQueueItem(item.id, { status: 'processing' });
           
           try {
-            if (n8nWebhookUrl) {
-              const payload = {
-                action: item.type === 'create' ? 'create_post' : 'auto_post_batch',
-                images: item.images,
-                content: item.content,
-                generatedPosts: item.generatedPosts,
-                postMode: item.postMode,
-                platforms: item.platforms,
-                schedule: 'now', // Executing now
-              };
-              
-              await fetch(n8nWebhookUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-              });
+            if (!n8nWebhookUrl) {
+              console.error('Webhook URL is not configured.');
+              updateQueueItem(item.id, { status: 'cancelled' });
+              return;
             }
+
+            const isGroupMode = item.type === 'auto' && item.postMode === 'group';
+            const finalContent = isGroupMode && item.generatedPosts ? item.generatedPosts[0].content : item.content;
+
+            const payload = {
+              action: 'create_post',
+              images: item.images,
+              content: finalContent,
+              platforms: item.platforms,
+              scheduleTime: new Date(item.scheduleTime).toISOString(), // Send exact time to n8n
+              fbPageId,
+              fbToken,
+              igAccountId
+            };
+            
+            const response = await fetch(n8nWebhookUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            
+            if (!response.ok) {
+              throw new Error(`Webhook failed with status ${response.status} ${response.statusText}`);
+            }
+            
             updateQueueItem(item.id, { status: 'published' });
           } catch (error) {
             console.error('Webhook error:', error);
+            toast.error('Lỗi kết nối Webhook trong Hàng đợi. Vui lòng bật "Respond to CORS" trong n8n.');
             updateQueueItem(item.id, { status: 'cancelled' }); // Mark failed as cancelled
           }
         }
@@ -70,23 +84,23 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans">
       <Toaster position="top-right" />
       {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shadow-sm z-10">
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-indigo-600 flex items-center gap-2">
-            <Zap className="w-6 h-6 fill-indigo-600" />
+      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col shadow-xl z-10">
+        <div className="p-6 border-b border-slate-800">
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2 tracking-tight">
+            <Zap className="w-6 h-6 text-indigo-400 fill-indigo-400" />
             NMT TOOL PRO
           </h1>
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <button
             onClick={() => setActiveTab('create')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
               activeTab === 'create'
-                ? 'bg-indigo-50 text-indigo-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-indigo-600 text-white font-medium shadow-md shadow-indigo-900/20'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
           >
             <PenSquare className="w-5 h-5" />
@@ -94,10 +108,10 @@ export default function App() {
           </button>
           <button
             onClick={() => setActiveTab('auto')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
               activeTab === 'auto'
-                ? 'bg-indigo-50 text-indigo-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-indigo-600 text-white font-medium shadow-md shadow-indigo-900/20'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
           >
             <LayoutDashboard className="w-5 h-5" />
@@ -105,10 +119,10 @@ export default function App() {
           </button>
           <button
             onClick={() => setActiveTab('queue')}
-            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-colors ${
+            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 ${
               activeTab === 'queue'
-                ? 'bg-indigo-50 text-indigo-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-indigo-600 text-white font-medium shadow-md shadow-indigo-900/20'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
           >
             <div className="flex items-center gap-3">
@@ -116,32 +130,30 @@ export default function App() {
               Đang chờ
             </div>
             {pendingCount > 0 && (
-              <span className="bg-indigo-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+              <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${activeTab === 'queue' ? 'bg-white text-indigo-600' : 'bg-indigo-500 text-white'}`}>
                 {pendingCount}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('settings')}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
               activeTab === 'settings'
-                ? 'bg-indigo-50 text-indigo-700 font-medium'
-                : 'text-gray-600 hover:bg-gray-100'
+                ? 'bg-indigo-600 text-white font-medium shadow-md shadow-indigo-900/20'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
           >
             <SettingsIcon className="w-5 h-5" />
             Cài đặt (Settings)
           </button>
         </nav>
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-slate-800">
           <button
             onClick={() => {
-              if (window.confirm('Bạn có chắc chắn muốn đăng xuất và xóa tất cả dữ liệu không?')) {
-                logout();
-                toast.success('Đã đăng xuất!');
-              }
+              logout();
+              toast.success('Đã đăng xuất!');
             }}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors font-medium"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-white transition-all duration-200 font-medium border border-slate-700/50"
           >
             <RefreshCw className="w-4 h-4" />
             Đăng xuất
@@ -150,8 +162,8 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-8">
+      <main className="flex-1 overflow-y-auto bg-slate-50/50">
+        <div className="max-w-6xl mx-auto p-8">
           {renderContent()}
         </div>
       </main>

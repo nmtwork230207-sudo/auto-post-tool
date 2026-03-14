@@ -16,17 +16,42 @@ export default function ImageUploader({ images, onChange, multiple = true }: Ima
 
     files.forEach(file => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        newBase64Images.push(reader.result as string);
-        processedCount++;
-        
-        if (processedCount === files.length) {
-          if (multiple) {
-            onChange([...images, ...newBase64Images]);
-          } else {
-            onChange([newBase64Images[0]]);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Max dimension 1200px
+          const MAX_DIMENSION = 1200;
+          if (width > height && width > MAX_DIMENSION) {
+            height *= MAX_DIMENSION / width;
+            width = MAX_DIMENSION;
+          } else if (height > MAX_DIMENSION) {
+            width *= MAX_DIMENSION / height;
+            height = MAX_DIMENSION;
           }
-        }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          
+          // Compress to JPEG with 0.8 quality
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          newBase64Images.push(compressedBase64);
+          processedCount++;
+          
+          if (processedCount === files.length) {
+            if (multiple) {
+              onChange([...images, ...newBase64Images]);
+            } else {
+              onChange([newBase64Images[0]]);
+            }
+          }
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     });
