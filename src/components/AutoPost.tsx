@@ -62,13 +62,40 @@ export default function AutoPost() {
     try {
       const ai = new GoogleGenAI({ apiKey: geminiApiKey || process.env.GEMINI_API_KEY });
       
+      const shopDetails = [
+        shopInfo.name ? `- Tên shop: ${shopInfo.name}` : '',
+        shopInfo.phone ? `- SĐT/Zalo: ${shopInfo.phone}` : '',
+        shopInfo.address ? `- Địa chỉ: ${shopInfo.address}` : '',
+        shopInfo.hashtags ? `${shopInfo.hashtags}` : ''
+      ].filter(Boolean).join('\n');
+
+      const buildPrompt = (isGroup: boolean) => `
+QUY TẮC BẮT BUỘC:
+- TUYỆT ĐỐI không dùng ký tự markdown: **, *, #, ---, __, []
+- Dùng emoji thay thế để tạo điểm nhấn (✨, 🔥, 💥, ✅, 👉, 📦...)
+- Không được liệt kê đặc điểm kỹ thuật khô khan
+- Viết như người bán hàng thật nói chuyện với khách, gần gũi, tự nhiên
+- Độ dài: 150–250 từ, KHÔNG được dài hơn
+- Luôn có 1 câu kêu gọi hành động (CTA) cuối bài
+- Kết thúc bằng 5–8 hashtag ngắn gọn liên quan
+
+CẤU TRÚC BÀI VIẾT:
+${autoPostDraft.answerStructure}
+
+THÔNG TIN SHOP (luôn thêm vào cuối nếu có):
+${shopDetails ? shopDetails : 'Bỏ qua phần thông tin shop vì chưa có.'}
+
+Dựa vào ${isGroup ? 'TẤT CẢ các hình ảnh' : 'hình ảnh'} sản phẩm được cung cấp, hãy viết bài đăng bán hàng theo đúng quy tắc và cấu trúc trên.
+Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
+      `.trim();
+
       if (autoPostDraft.postMode === 'single') {
         for (let i = 0; i < (autoPostDraft.images || []).length; i++) {
           const imgBase64 = autoPostDraft.images[i];
           const matches = imgBase64.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
           if (!matches) continue;
 
-          const prompt = `Hãy viết một bài đăng bán hàng cho hình ảnh này dựa trên cấu trúc sau:\n\n${autoPostDraft.answerStructure}\n\nPhong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}`;
+          const prompt = buildPrompt(false);
           const response = await ai.models.generateContent({
             model: geminiModel || 'gemini-2.5-flash',
             contents: {
@@ -79,7 +106,7 @@ export default function AutoPost() {
             }
           });
           
-          const finalContent = `${response.text || ''}${shopInfo.name ? `\n\n${shopInfo.name} - ${shopInfo.phone}\n${shopInfo.address}\n${shopInfo.hashtags}` : ''}`;
+          const finalContent = response.text || '';
           
           generated.push({
             id: Date.now().toString() + i,
@@ -95,7 +122,7 @@ export default function AutoPost() {
           return matches ? { inlineData: { mimeType: matches[1], data: matches[2] } } : null;
         }).filter(Boolean) as any[];
 
-        const prompt = `Hãy viết một bài đăng bán hàng chung cho TẤT CẢ các hình ảnh này dựa trên cấu trúc sau:\n\n${autoPostDraft.answerStructure}\n\nPhong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}`;
+        const prompt = buildPrompt(true);
         const response = await ai.models.generateContent({
           model: geminiModel || 'gemini-2.5-flash',
           contents: {
@@ -103,7 +130,7 @@ export default function AutoPost() {
           }
         });
 
-        const finalContent = `${response.text || ''}${shopInfo.name ? `\n\n${shopInfo.name} - ${shopInfo.phone}\n${shopInfo.address}\n${shopInfo.hashtags}` : ''}`;
+        const finalContent = response.text || '';
 
         generated.push({
           id: Date.now().toString(),

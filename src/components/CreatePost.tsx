@@ -43,24 +43,35 @@ export default function CreatePost() {
         };
       });
 
+      const shopDetails = [
+        shopInfo.name ? `- Tên shop: ${shopInfo.name}` : '',
+        shopInfo.phone ? `- SĐT/Zalo: ${shopInfo.phone}` : '',
+        shopInfo.address ? `- Địa chỉ: ${shopInfo.address}` : '',
+        shopInfo.hashtags ? `${shopInfo.hashtags}` : ''
+      ].filter(Boolean).join('\n');
+
       const prompt = `
-        Bạn là một chuyên gia viết nội dung quảng cáo (copywriter) chuyên nghiệp trên mạng xã hội.
-        Hãy viết một bài đăng bán hàng hấp dẫn dựa trên hình ảnh sản phẩm được cung cấp.
-        
-        Phong cách viết: ${createPostDraft.style}
-        
-        Thông tin cửa hàng (hãy chèn vào cuối bài đăng như một Call-to-action):
-        - Tên Shop: ${shopInfo.name || 'Chưa cập nhật'}
-        - SĐT/Zalo: ${shopInfo.phone || 'Chưa cập nhật'}
-        - Địa chỉ: ${shopInfo.address || 'Chưa cập nhật'}
-        - Hashtags: ${shopInfo.hashtags || '#sanpham'}
-        
-        Yêu cầu:
-        - Tiêu đề thu hút (in hoa hoặc dùng emoji).
-        - Nêu bật lợi ích và đặc điểm sản phẩm từ hình ảnh.
-        - Có lời kêu gọi hành động (Call to action) rõ ràng.
-        - Trình bày bố cục dễ đọc, dùng emoji phù hợp.
-      `;
+QUY TẮC BẮT BUỘC:
+- TUYỆT ĐỐI không dùng ký tự markdown: **, *, #, ---, __, []
+- Dùng emoji thay thế để tạo điểm nhấn (✨, 🔥, 💥, ✅, 👉, 📦...)
+- Không được liệt kê đặc điểm kỹ thuật khô khan
+- Viết như người bán hàng thật nói chuyện với khách, gần gũi, tự nhiên
+- Độ dài: 150–250 từ, KHÔNG được dài hơn
+- Luôn có 1 câu kêu gọi hành động (CTA) cuối bài
+- Kết thúc bằng 5–8 hashtag ngắn gọn liên quan
+
+CẤU TRÚC BÀI VIẾT:
+1. Dòng mở đầu: Câu hook gây chú ý (1 câu, có emoji)
+2. Thân bài: 2–3 lợi ích thực tế của sản phẩm (viết như kể chuyện, không liệt kê)
+3. CTA: Kêu khách nhắn tin / bình luận / gọi ngay
+4. Hashtag
+
+THÔNG TIN SHOP (luôn thêm vào cuối nếu có):
+${shopDetails ? shopDetails : 'Bỏ qua phần thông tin shop vì chưa có.'}
+
+Dựa vào hình ảnh sản phẩm được cung cấp, hãy viết bài đăng bán hàng theo đúng quy tắc và cấu trúc trên.
+Phong cách viết: ${createPostDraft.style}
+      `.trim();
 
       const response = await ai.models.generateContent({
         model: geminiModel || 'gemini-2.5-flash',
