@@ -56,7 +56,7 @@ export default function Settings() {
         {/* Shop Info */}
         <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-            <Store className="w-5 h-5 text-indigo-600" />
+            <Store className="w-5 h-5 text-blue-600" />
             <h3 className="text-lg font-semibold text-slate-900">Thông tin Cửa hàng (CTA Cuối bài)</h3>
           </div>
           
@@ -67,7 +67,7 @@ export default function Settings() {
                 type="text"
                 value={shopInfo.name}
                 onChange={(e) => updateSettings({ shopInfo: { ...shopInfo, name: e.target.value } })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-[15px] text-slate-700"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-[15px] text-slate-700"
                 placeholder="VD: Thời Trang XYZ"
               />
             </div>
@@ -77,7 +77,7 @@ export default function Settings() {
                 type="text"
                 value={shopInfo.phone}
                 onChange={(e) => updateSettings({ shopInfo: { ...shopInfo, phone: e.target.value } })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-[15px] text-slate-700"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-[15px] text-slate-700"
                 placeholder="VD: 0987.654.321"
               />
             </div>
@@ -87,7 +87,7 @@ export default function Settings() {
                 type="text"
                 value={shopInfo.address}
                 onChange={(e) => updateSettings({ shopInfo: { ...shopInfo, address: e.target.value } })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-[15px] text-slate-700"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-[15px] text-slate-700"
                 placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM"
               />
             </div>
@@ -97,7 +97,7 @@ export default function Settings() {
                 type="text"
                 value={shopInfo.hashtags}
                 onChange={(e) => updateSettings({ shopInfo: { ...shopInfo, hashtags: e.target.value } })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-[15px] text-slate-700"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-[15px] text-slate-700"
                 placeholder="VD: #thoitrang #xuhuong #sale"
               />
             </div>
@@ -107,7 +107,7 @@ export default function Settings() {
         {/* API & Integrations */}
         <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-            <Webhook className="w-5 h-5 text-indigo-600" />
+            <Webhook className="w-5 h-5 text-blue-600" />
             <h3 className="text-lg font-semibold text-slate-900">Tích hợp n8n & API</h3>
           </div>
           
@@ -119,13 +119,13 @@ export default function Settings() {
                   type="text"
                   value={n8nWebhookUrl}
                   onChange={(e) => updateSettings({ n8nWebhookUrl: e.target.value })}
-                  className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-mono text-sm text-slate-700"
+                  className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono text-sm text-slate-700"
                   placeholder="https://your-n8n-instance.com/webhook/..."
                 />
                 <button
                   onClick={handleTestWebhook}
                   disabled={isTesting}
-                  className="px-5 py-2.5 bg-indigo-50 text-indigo-700 rounded-xl font-medium hover:bg-indigo-100 transition-colors whitespace-nowrap disabled:opacity-50"
+                  className="px-5 py-2.5 bg-blue-50 text-blue-700 rounded-xl font-medium hover:bg-blue-100 transition-colors whitespace-nowrap disabled:opacity-50"
                 >
                   {isTesting ? 'Đang test...' : 'Test Webhook'}
                 </button>
@@ -140,7 +140,7 @@ export default function Settings() {
         {/* Cấu hình AI (Gemini) */}
         <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-            <div className="w-5 h-5 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-md font-bold text-xs">AI</div>
+            <div className="w-5 h-5 flex items-center justify-center bg-blue-100 text-blue-600 rounded-md font-bold text-xs">AI</div>
             <h3 className="text-lg font-semibold text-slate-900">Cấu hình AI (Gemini)</h3>
           </div>
           
@@ -151,11 +151,11 @@ export default function Settings() {
                 type="password"
                 value={geminiApiKey}
                 onChange={(e) => updateSettings({ geminiApiKey: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-mono text-sm text-slate-700"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono text-sm text-slate-700"
                 placeholder="Để trống để dùng Key mặc định"
               />
               <p className="text-xs text-slate-500 mt-2">
-                Lấy API Key miễn phí tại <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">Google AI Studio</a>.
+                Lấy API Key miễn phí tại <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Google AI Studio</a>.
               </p>
             </div>
             <div>
@@ -163,7 +163,7 @@ export default function Settings() {
               <select
                 value={geminiModel}
                 onChange={(e) => updateSettings({ geminiModel: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-[15px] text-slate-700"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-[15px] text-slate-700"
               >
                 <option value="gemini-2.5-flash">Gemini 2.5 Flash (Nhanh, Rẻ, Khuyên dùng)</option>
                 <option value="gemini-3-flash-preview">Gemini 3.0 Flash Preview</option>
@@ -177,7 +177,7 @@ export default function Settings() {
         {/* Social Accounts */}
         <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/60">
           <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4">
-            <Key className="w-5 h-5 text-indigo-600" />
+            <Key className="w-5 h-5 text-blue-600" />
             <h3 className="text-lg font-semibold text-slate-900">Tài khoản Mạng xã hội</h3>
           </div>
           
@@ -189,7 +189,7 @@ export default function Settings() {
                   type="text"
                   value={fbPageId}
                   onChange={(e) => updateSettings({ fbPageId: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-mono text-sm text-slate-700"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono text-sm text-slate-700"
                   placeholder="VD: 10123456789"
                 />
               </div>
@@ -199,7 +199,7 @@ export default function Settings() {
                   type="text"
                   value={igAccountId}
                   onChange={(e) => updateSettings({ igAccountId: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-mono text-sm text-slate-700"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono text-sm text-slate-700"
                   placeholder="VD: 17841400000000"
                 />
               </div>
@@ -209,7 +209,7 @@ export default function Settings() {
                   type="password"
                   value={fbToken}
                   onChange={(e) => updateSettings({ fbToken: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-mono text-sm text-slate-700"
+                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all font-mono text-sm text-slate-700"
                   placeholder="EAA..."
                 />
                 <p className="text-xs text-slate-500 mt-2">

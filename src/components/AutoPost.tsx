@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 import ImageUploader from './ImageUploader';
-import { Layers, Image as ImageIcon, Clock, Play, RefreshCw, Sparkles, Facebook, Instagram, CheckSquare, Eye, EyeOff } from 'lucide-react';
+import { Layers, Image as ImageIcon, Clock, Play, RefreshCw, Sparkles, Facebook, Instagram, CheckSquare, Eye, EyeOff, Maximize2, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { GoogleGenAI } from '@google/genai';
 
@@ -14,6 +14,7 @@ export default function AutoPost() {
   const [isGeneratingStructure, setIsGeneratingStructure] = useState(false);
   const [isGeneratingBatch, setIsGeneratingBatch] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [editingPostIndex, setEditingPostIndex] = useState<number | null>(null);
 
   const allPlatformsSelected = autoPostDraft.platforms?.fb && autoPostDraft.platforms?.ig;
 
@@ -291,7 +292,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
             resetDrafts();
             toast.success('Đã làm mới biểu mẫu!');
           }}
-          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:text-indigo-600 hover:border-indigo-200 transition-all font-medium shadow-sm text-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 transition-all font-medium shadow-sm text-sm"
         >
           <RefreshCw className="w-4 h-4" /> Làm mới trang
         </button>
@@ -307,7 +308,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
               onChange={(imgs) => updateAutoPost({ images: imgs })} 
               multiple={true}
             />
-            <div className="mt-4 text-sm font-medium text-indigo-600 bg-indigo-50 inline-block px-3 py-1 rounded-lg">
+            <div className="mt-4 text-sm font-medium text-blue-600 bg-blue-50 inline-block px-3 py-1 rounded-lg">
               Đã tải lên: {(autoPostDraft.images || []).length} ảnh
             </div>
           </div>
@@ -318,7 +319,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
               <button
                 onClick={handleAIGenerateStructure}
                 disabled={isGeneratingStructure}
-                className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:from-indigo-600 hover:to-violet-600 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-md shadow-indigo-500/20 disabled:opacity-50"
+                className="bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:from-blue-600 hover:to-violet-600 px-4 py-2 rounded-xl text-sm font-medium flex items-center gap-2 transition-all shadow-md shadow-blue-500/20 disabled:opacity-50"
               >
                 {isGeneratingStructure ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                 AI viết giúp
@@ -333,7 +334,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
               <select
                 value={autoPostDraft.style || 'professional'}
                 onChange={(e) => updateAutoPost({ style: e.target.value })}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-sm"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm"
               >
                 <option value="professional">Chuyên nghiệp, lịch sự</option>
                 <option value="funny">Hài hước, dí dỏm</option>
@@ -348,14 +349,14 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
               value={autoPostDraft.answerStructure}
               onChange={(e) => updateAutoPost({ answerStructure: e.target.value })}
               rows={4}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all resize-none font-mono text-sm text-slate-700"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all resize-none font-mono text-sm text-slate-700"
               placeholder="VD: Viết một bài đăng bán hàng ngắn gọn. Bắt đầu bằng 1 câu hỏi thu hút. Nêu 3 ưu điểm của sản phẩm trong ảnh. Kết thúc bằng lời kêu gọi mua hàng."
             />
             
             <button
               onClick={handleGenerateBatchContent}
               disabled={isGeneratingBatch || !autoPostDraft.images || autoPostDraft.images.length === 0}
-              className="w-full mt-6 py-3.5 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-xl font-medium hover:from-indigo-600 hover:to-violet-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 relative overflow-hidden shadow-md shadow-indigo-500/20"
+              className="w-full mt-6 py-3.5 bg-gradient-to-r from-blue-500 to-violet-500 text-white rounded-xl font-medium hover:from-blue-600 hover:to-violet-600 transition-all flex items-center justify-center gap-2 disabled:opacity-50 relative overflow-hidden shadow-md shadow-blue-500/20"
             >
               {isGeneratingBatch && (
                 <div 
@@ -409,9 +410,15 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                               toast.error('Lỗi khi viết lại bài.');
                             }
                           }}
-                          className="text-xs text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium bg-indigo-50 px-2 py-1 rounded-md transition-colors"
+                          className="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium bg-blue-50 px-2 py-1 rounded-md transition-colors"
                         >
                           <Sparkles className="w-3 h-3" /> Viết lại
+                        </button>
+                        <button
+                          onClick={() => setEditingPostIndex(idx)}
+                          className="text-xs text-slate-600 hover:text-slate-900 flex items-center gap-1 font-medium bg-slate-100 px-2 py-1 rounded-md transition-colors"
+                        >
+                          <Maximize2 className="w-3 h-3" /> Phóng to
                         </button>
                       </div>
                       <textarea
@@ -421,7 +428,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                           newPosts[idx].content = e.target.value;
                           updateAutoPost({ generatedPosts: newPosts });
                         }}
-                        className="w-full h-28 text-[13px] leading-relaxed bg-white border border-slate-200 rounded-lg p-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none custom-scrollbar text-slate-700"
+                        className="w-full h-28 text-[13px] leading-relaxed bg-white border border-slate-200 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none custom-scrollbar text-slate-700"
                       />
                     </div>
                   </div>
@@ -437,7 +444,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
               <h3 className="text-lg font-semibold text-slate-800">3. Cấu hình đăng</h3>
               <button 
                 onClick={handleToggleAllPlatforms}
-                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1.5"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1.5"
               >
                 <CheckSquare className="w-4 h-4" /> {allPlatformsSelected ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
               </button>
@@ -473,7 +480,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                 <label className="block text-sm font-medium text-slate-700 mb-3">Chế độ đăng</label>
                 <div className="space-y-3">
                   <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                    autoPostDraft.postMode === 'single' ? 'border-indigo-500 bg-indigo-50 shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    autoPostDraft.postMode === 'single' ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                   }`}>
                     <input
                       type="radio"
@@ -482,7 +489,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                       onChange={() => updateAutoPost({ postMode: 'single' })}
                       className="hidden"
                     />
-                    <div className={`p-2 rounded-lg ${autoPostDraft.postMode === 'single' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
+                    <div className={`p-2 rounded-lg ${autoPostDraft.postMode === 'single' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
                       <ImageIcon className="w-5 h-5" />
                     </div>
                     <div>
@@ -492,7 +499,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                   </label>
 
                   <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${
-                    autoPostDraft.postMode === 'group' ? 'border-indigo-500 bg-indigo-50 shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                    autoPostDraft.postMode === 'group' ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                   }`}>
                     <input
                       type="radio"
@@ -501,7 +508,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                       onChange={() => updateAutoPost({ postMode: 'group' })}
                       className="hidden"
                     />
-                    <div className={`p-2 rounded-lg ${autoPostDraft.postMode === 'group' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-100 text-slate-500'}`}>
+                    <div className={`p-2 rounded-lg ${autoPostDraft.postMode === 'group' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}`}>
                       <Layers className="w-5 h-5" />
                     </div>
                     <div>
@@ -548,7 +555,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                       timeIntervals={15}
                       dateFormat="dd/MM/yyyy h:mm aa"
                       placeholderText="Chọn ngày và giờ"
-                      className="flex-1 w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-sm"
+                      className="flex-1 w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm"
                     />
                   </div>
                 )}
@@ -562,7 +569,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                         min="1"
                         value={autoPostDraft.postsPerDay}
                         onChange={(e) => updateAutoPost({ postsPerDay: parseInt(e.target.value) || 1 })}
-                        className="w-full max-w-[120px] px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-sm"
+                        className="w-full max-w-[120px] px-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all text-sm"
                       />
                     </div>
                     <div>
@@ -595,7 +602,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
                           onClick={() => {
                             updateAutoPost({ timeSlots: [...(autoPostDraft.timeSlots || []), '12:00'] });
                           }}
-                          className="text-sm text-indigo-600 hover:text-indigo-700 font-medium bg-indigo-50 px-3 py-2 rounded-xl transition-all"
+                          className="text-sm text-blue-600 hover:text-blue-700 font-medium bg-blue-50 px-3 py-2 rounded-xl transition-all"
                         >
                           + Thêm giờ
                         </button>
@@ -609,7 +616,7 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
             <button
               onClick={handleStartAutoPost}
               disabled={isRunning || !autoPostDraft.generatedPosts || autoPostDraft.generatedPosts.length === 0}
-              className="w-full mt-8 py-4 bg-indigo-600 text-white rounded-xl font-medium text-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/20 disabled:opacity-70"
+              className="w-full mt-8 py-4 bg-blue-600 text-white rounded-xl font-medium text-lg hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 disabled:opacity-70"
             >
               {isRunning ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Play className="w-6 h-6 fill-current" />}
               {isRunning ? 'Đang khởi chạy...' : 'Đưa vào hàng đợi'}
@@ -617,6 +624,54 @@ Phong cách viết: ${autoPostDraft.style || 'Chuyên nghiệp'}
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Edit Modal */}
+      {editingPostIndex !== null && autoPostDraft.generatedPosts && autoPostDraft.generatedPosts[editingPostIndex] && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50">
+              <h3 className="text-lg font-semibold text-slate-800">Chỉnh sửa bài đăng {editingPostIndex + 1}</h3>
+              <button 
+                onClick={() => setEditingPostIndex(null)}
+                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 flex flex-col md:flex-row gap-6">
+              <div className="w-full md:w-1/3 shrink-0">
+                <div className="rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-slate-100 h-64 md:h-full min-h-[250px]">
+                  <img 
+                    src={autoPostDraft.generatedPosts[editingPostIndex].image} 
+                    alt="Preview" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              </div>
+              <div className="w-full md:w-2/3 flex flex-col">
+                <label className="block text-sm font-medium text-slate-700 mb-2">Nội dung bài đăng</label>
+                <textarea
+                  value={autoPostDraft.generatedPosts[editingPostIndex].content}
+                  onChange={(e) => {
+                    const newPosts = [...autoPostDraft.generatedPosts!];
+                    newPosts[editingPostIndex].content = e.target.value;
+                    updateAutoPost({ generatedPosts: newPosts });
+                  }}
+                  className="flex-1 w-full min-h-[300px] text-[15px] leading-relaxed bg-white border border-slate-200 rounded-xl p-4 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 resize-none custom-scrollbar text-slate-800 shadow-sm"
+                />
+              </div>
+            </div>
+            <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end">
+              <button
+                onClick={() => setEditingPostIndex(null)}
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm shadow-blue-600/20"
+              >
+                Xong
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

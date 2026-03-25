@@ -79,9 +79,9 @@ export default function ImageUploader({ images, onChange, multiple = true }: Ima
         ))}
         
         {(multiple || (images || []).length === 0) && (
-          <label className="w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-indigo-300 bg-indigo-50/50 rounded-xl cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors group">
-            <Images className="w-7 h-7 text-indigo-400 mb-2 group-hover:text-indigo-600 transition-colors" />
-            <span className="text-xs text-indigo-600 font-medium text-center px-2">
+          <label className="w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-blue-300 bg-blue-50/50 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors group">
+            <Images className="w-7 h-7 text-blue-400 mb-2 group-hover:text-blue-600 transition-colors" />
+            <span className="text-xs text-blue-600 font-medium text-center px-2">
               {multiple ? 'Chọn nhiều ảnh' : 'Tải ảnh lên'}
             </span>
             {multiple && <span className="text-[10px] text-gray-400 mt-1">(Ctrl/Cmd + Click)</span>}

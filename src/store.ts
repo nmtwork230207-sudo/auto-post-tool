@@ -33,6 +33,8 @@ export interface QueueItem {
   intervalTime?: number;
   postsPerInterval?: number;
   status: 'pending' | 'processing' | 'published' | 'cancelled';
+  sentToN8n?: boolean;
+  isSending?: boolean;
 }
 
 export interface AppState {

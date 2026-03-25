@@ -11,9 +11,14 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
   const formatCountdown = (targetTime: number) => {
     const diff = targetTime - now;
     if (diff <= 0) return '00:00:00';
-    const h = Math.floor(diff / (1000 * 60 * 60));
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
+    
+    if (d > 0) {
+      return `${d} ngày ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
@@ -42,7 +47,7 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
         
         <div className="flex-1 w-full">
           <div className="flex items-center gap-2 mb-2">
-            <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-semibold uppercase tracking-wider rounded-md">
+            <span className="px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-semibold uppercase tracking-wider rounded-md">
               {item.type === 'create' ? 'Bài đăng đơn' : 'Chiến dịch tự động'}
             </span>
             <div className="flex gap-1.5">
@@ -71,16 +76,18 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
         <div className="flex flex-col items-end gap-2 w-full md:w-auto min-w-[120px]">
           {item.status === 'pending' && (
             <>
-              <div className="text-2xl font-mono font-bold text-indigo-600 tracking-tight">
+              <div className="text-2xl font-mono font-bold text-blue-600 tracking-tight">
                 {formatCountdown(item.scheduleTime)}
               </div>
               <div className="flex gap-2">
-                <button 
-                  onClick={() => updateQueueItem(item.id, { status: 'cancelled' })}
-                  className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1 font-medium bg-amber-50 px-3 py-1.5 rounded-lg transition-all hover:bg-amber-100"
-                >
-                  <XCircle className="w-4 h-4" /> Hủy đăng
-                </button>
+                {!item.sentToN8n && (
+                  <button 
+                    onClick={() => updateQueueItem(item.id, { status: 'cancelled' })}
+                    className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1 font-medium bg-amber-50 px-3 py-1.5 rounded-lg transition-all hover:bg-amber-100"
+                  >
+                    <XCircle className="w-4 h-4" /> Hủy đăng
+                  </button>
+                )}
                 <button 
                   onClick={() => {
                     removeFromQueue(item.id);
@@ -91,6 +98,11 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
                   <Trash2 className="w-4 h-4" /> Xóa
                 </button>
               </div>
+              {item.sentToN8n && (
+                <div className="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
+                  <CheckCircle2 className="w-3 h-3" /> Đã đồng bộ n8n
+                </div>
+              )}
             </>
           )}
           {item.status === 'processing' && (
@@ -130,7 +142,7 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
                   updateQueueItem(item.id, { status: 'pending', scheduleTime: Date.now() });
                   toast.success('Đã xếp hàng lại!');
                 }}
-                className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium bg-indigo-50 px-3 py-1.5 rounded-lg transition-all hover:bg-indigo-100"
+                className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium bg-blue-50 px-3 py-1.5 rounded-lg transition-all hover:bg-blue-100"
                 title="Thử lại"
               >
                 <RefreshCw className="w-4 h-4" /> Thử lại
@@ -150,7 +162,7 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
           
           <button 
             onClick={() => setExpanded(!expanded)}
-            className="text-sm text-indigo-600 hover:text-indigo-700 flex items-center gap-1 font-medium mt-1 transition-colors"
+            className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1 font-medium mt-1 transition-colors"
           >
             {expanded ? <><ChevronUp className="w-4 h-4" /> Thu gọn</> : <><ChevronDown className="w-4 h-4" /> Xem thêm</>}
           </button>
@@ -161,19 +173,22 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
         <div className="mt-4 pt-4 border-t border-slate-100 animate-in fade-in slide-in-from-top-2">
           <div className="flex justify-between items-center mb-4">
             <h4 className="font-semibold text-slate-800">Nội dung chi tiết</h4>
-            <button 
-              onClick={handleSave}
-              className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-1.5 transition-all shadow-sm shadow-indigo-600/20 font-medium"
-            >
-              <Save className="w-4 h-4" /> Lưu thay đổi
-            </button>
+            {!item.sentToN8n && (
+              <button 
+                onClick={handleSave}
+                className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1.5 transition-all shadow-sm shadow-blue-600/20 font-medium"
+              >
+                <Save className="w-4 h-4" /> Lưu thay đổi
+              </button>
+            )}
           </div>
           
           {item.type === 'create' ? (
             <textarea
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
-              className="w-full h-40 p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 resize-none text-[15px] leading-relaxed text-slate-700 transition-all custom-scrollbar"
+              disabled={item.sentToN8n}
+              className={`w-full h-40 p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 resize-none text-[15px] leading-relaxed text-slate-700 transition-all custom-scrollbar ${item.sentToN8n ? 'opacity-70 cursor-not-allowed' : ''}`}
               placeholder="Nội dung bài đăng..."
             />
           ) : (
@@ -192,7 +207,8 @@ function QueueItem({ item, now, updateQueueItem, removeFromQueue }: any) {
                         newPosts[idx].content = e.target.value;
                         setEditedGeneratedPosts(newPosts);
                       }}
-                      className="w-full h-28 text-[13px] leading-relaxed bg-white border border-slate-200 rounded-lg p-3 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 resize-none custom-scrollbar text-slate-700"
+                      disabled={item.sentToN8n}
+                      className={`w-full h-28 text-[13px] leading-relaxed bg-white border border-slate-200 rounded-lg p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-none custom-scrollbar text-slate-700 ${item.sentToN8n ? 'opacity-70 cursor-not-allowed' : ''}`}
                     />
                   </div>
                 </div>
@@ -231,7 +247,7 @@ export default function Queue() {
         <button
           onClick={() => setActiveTab('pending')}
           className={`px-6 py-3.5 font-medium text-sm border-b-2 transition-all ${
-            activeTab === 'pending' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            activeTab === 'pending' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
           }`}
         >
           Đang chờ ({pendingItems.length})
@@ -239,7 +255,7 @@ export default function Queue() {
         <button
           onClick={() => setActiveTab('history')}
           className={`px-6 py-3.5 font-medium text-sm border-b-2 transition-all ${
-            activeTab === 'history' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+            activeTab === 'history' ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
           }`}
         >
           Lịch sử ({historyItems.length})
